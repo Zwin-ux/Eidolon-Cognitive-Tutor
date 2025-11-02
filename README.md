@@ -1,3 +1,14 @@
+---
+title: "Eidolon Cognitive Tutor"
+emoji: "🧠"
+colorFrom: "blue"
+colorTo: "purple"
+sdk: "gradio"
+sdk_version: "4.0.0"
+app_file: "app.py"
+pinned: false
+---
+
 # Cognitive LLM with Qwen3
 
 A simple implementation of a cognitive language model using Qwen3-7B-Instruct from Hugging Face.
