@@ -1,12 +1,9 @@
 ---
 title: Eidolon Cognitive Tutor
 emoji: 🧠
-colorFrom: blue
-colorTo: purple
 sdk: gradio
-sdk_version: 5.49.1
 app_file: app.py
-pinned: false
+license: apache-2.0
 ---
 
 # Cognitive LLM with Qwen3
@@ -31,6 +28,7 @@ A simple implementation of a cognitive language model using Qwen3-7B-Instruct fr
 
 1. Clone this repository
 2. Install the required packages:
+
    ```bash
    pip install -r requirements.txt
    ```
@@ -38,6 +36,7 @@ A simple implementation of a cognitive language model using Qwen3-7B-Instruct fr
 ## Usage
 
 1. Run the interactive CLI:
+
    ```bash
    python cognitive_llm.py
    ```
