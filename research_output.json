@@ -1,0 +1,89 @@
+{
+  "user_id": "sunny_test",
+  "session_start": "2025-11-01T22:59:20.445840",
+  "metrics": {
+    "session_metrics": {
+      "duration_seconds": 2.298408,
+      "total_responses": 6,
+      "accuracy": 0.5,
+      "avg_response_time": 2.3333723147710166,
+      "hints_per_response": 0.6666666666666666,
+      "learning_gain": 0.0
+    },
+    "cumulative_metrics": {
+      "total_responses": 6,
+      "accuracy": 0.5,
+      "avg_response_time": 2.3333723147710166,
+      "hints_per_response": 0.6666666666666666,
+      "learning_gain": 0.0,
+      "retention_rate": null,
+      "skill_masteries": 1
+    },
+    "knowledge_tracing": {
+      "tracked_skills": 1,
+      "skill_masteries": {
+        "algebra_simplification": {
+          "theta": 0.014428777179973144,
+          "mastery_prob": 0.503607131714598,
+          "practice_count": 7
+        }
+      }
+    }
+  },
+  "session_responses": [
+    {
+      "item_id": "test_001",
+      "skill": "algebra_simplification",
+      "correct": false,
+      "response_time": 2.0002338886260986,
+      "hints_used": 1,
+      "difficulty": 0.6,
+      "timestamp": "2025-11-01T22:59:22.449109"
+    },
+    {
+      "item_id": "test_002",
+      "skill": "algebra_simplification",
+      "correct": false,
+      "response_time": 3.0,
+      "hints_used": 2,
+      "difficulty": 0.6,
+      "timestamp": "2025-11-01T22:59:22.518361"
+    },
+    {
+      "item_id": "test_003",
+      "skill": "algebra_simplification",
+      "correct": false,
+      "response_time": 2.7,
+      "hints_used": 1,
+      "difficulty": 0.6,
+      "timestamp": "2025-11-01T22:59:22.562224"
+    },
+    {
+      "item_id": "test_004",
+      "skill": "algebra_simplification",
+      "correct": true,
+      "response_time": 2.4,
+      "hints_used": 0,
+      "difficulty": 0.6,
+      "timestamp": "2025-11-01T22:59:22.603972"
+    },
+    {
+      "item_id": "test_005",
+      "skill": "algebra_simplification",
+      "correct": true,
+      "response_time": 2.1,
+      "hints_used": 0,
+      "difficulty": 0.6,
+      "timestamp": "2025-11-01T22:59:22.648160"
+    },
+    {
+      "item_id": "test_006",
+      "skill": "algebra_simplification",
+      "correct": true,
+      "response_time": 1.8,
+      "hints_used": 0,
+      "difficulty": 0.6,
+      "timestamp": "2025-11-01T22:59:22.693063"
+    }
+  ]
+}
