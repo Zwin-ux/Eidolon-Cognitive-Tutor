@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#0b84ff" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#6dd3ff" stop-opacity="0.95"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="#f7f8fb"/>
+  <g transform="translate(60,56)">
+    <rect width="1080" height="528" rx="14" fill="#fff" stroke="#e6e9ef"/>
+    <rect x="28" y="28" width="480" height="220" rx="8" fill="url(#g)" />
+    <rect x="28" y="268" width="1040" height="200" rx="8" fill="#f1f5f9" />
+    <text x="540" y="80" font-family="Inter, Arial" font-size="28" fill="#0f1724" text-anchor="middle">Eidolon Demo</text>
+    <text x="540" y="116" font-family="Inter, Arial" font-size="14" fill="#475569" text-anchor="middle">Interactive tutor demo (DEMO_MODE)</text>
+    <text x="48" y="308" font-family="Inter, Arial" font-size="16" fill="#0f1724">User prompt:</text>
+    <text x="48" y="350" font-family="Inter, Arial" font-size="14" fill="#334155">Explain Newton's laws in simple terms</text>
+    <text x="48" y="396" font-family="Inter, Arial" font-size="16" fill="#0f1724">Demo response:</text>
+    <text x="48" y="432" font-family="Inter, Arial" font-size="14" fill="#0f1724">Newton's laws describe motion: inertia, F=ma, action-reaction...</text>
+  </g>
+</svg>

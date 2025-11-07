@@ -18,13 +18,15 @@
   </head>
   <body>
     <div class="card">
-      <h1>Eidolon Cognitive Tutor</h1>
-      <p class="lead">Ask the tutor a question. This demo proxies to a hosted inference API configured in the serverless function.</p>
+  <h1>Eidolon — Demo</h1>
+  <p class="lead">Quick, presentable demo of the interactive tutor interface (DEMO_MODE).</p>
 
-      <textarea id="prompt" placeholder="Explain Newton's laws in simple terms..."></textarea>
+  <img src="/public/assets/demo-screenshot.svg" alt="Demo screenshot" style="width:100%; border-radius:8px; margin-bottom:12px; box-shadow:0 8px 24px rgba(16,24,40,0.06)" />
+
+  <textarea id="prompt" placeholder="Type a sample prompt, e.g. 'Explain Newton's laws in simple terms'" ></textarea>
       <div class="meta">
         <button id="ask">Ask tutor</button>
-        <div class="small">Responses powered by your configured inference backend.</div>
+  <div class="small">Set `DEMO_MODE` on the server to enable safe demo responses (no external services required).</div>
       </div>
 
       <div class="out" id="out">Awaiting question...</div>
