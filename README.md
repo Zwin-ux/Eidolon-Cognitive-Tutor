@@ -37,80 +37,220 @@ A simple implementation of a cognitive language model using Qwen3-7B-Instruct fr
 title: Eidolon
 ---
 
-# Eidolon — interactive tutor demo
+# Eidolon — Interactive Tutor Demo
 
-This repository contains a small demo app: a static frontend plus a lightweight serverless API that accepts prompts and returns text responses. The project is organized so you can run a demo locally or deploy the static site and API to Vercel.
+Production-ready demo application: a static frontend with a serverless API that accepts prompts and returns adaptive responses. Built for easy deployment to Vercel or Hugging Face Spaces with optional inference backend integration.
 
-This README focuses only on the repository's functions and how to run or present it.
+## ✨ Features
 
-## Quick start (demo mode)
+- **Demo Mode**: Safe, deterministic responses for public demos (no API keys or model hosting required)
+- **External Inference**: Plug in any hosted inference API (Hugging Face, Replicate, custom endpoints)
+- **Conversation History**: SQLite-backed session storage with history retrieval
+- **Rate Limiting**: Configurable IP-based rate limiting to prevent abuse
+- **Modern UI**: Interactive interface with example prompts, copy buttons, and loading states
+- **Retry Logic**: Automatic retries with exponential backoff for inference calls
+- **CORS Support**: Cross-origin requests enabled for flexible deployment
 
-1. Install the developer dependencies (lightweight):
+## Quick Start (Demo Mode)
+
+Run the demo locally without any external services:
 
 ```powershell
+# Install lightweight dependencies
 pip install -r dev-requirements.txt
-```
 
-2. Start the demo (PowerShell):
-
-```powershell
+# Start demo (PowerShell)
 .\scripts\run_demo.ps1
+
+# Or manually
+$env:DEMO_MODE = "1"
+python app.py
 ```
 
-The demo runs the local UI and API in `DEMO_MODE`, which returns canned responses suitable for public demos.
+Visit the Gradio URL shown in the terminal (usually http://localhost:7860).
 
-## Files and functionality
+## Project Structure
 
-- `public/index.html` — static single-page UI used for demos.
-- `api/ask.py` — serverless API endpoint (FastAPI). It forwards requests to an external service when configured, or returns demo responses when `DEMO_MODE` is enabled.
-- `app.py` — local Gradio UI that can run in demo mode or proxy to an external service.
-- `cognitive_llm.py` — local model loader and interface (for development only; not required for demos).
-- `vercel.json` — Vercel configuration (serves `public/` and `api/`).
-- `dev-requirements.txt` — lightweight packages used for running tests and the demo without heavy ML libraries.
-- `tests/test_api.py` — a small test that verifies the API demo behavior.
-- `.github/workflows/ci.yml` — CI: installs `dev-requirements.txt`, runs tests and lint checks.
+```
+├── api/
+│   ├── ask.py          # FastAPI serverless endpoint (main API)
+│   └── history.py      # Conversation history storage (SQLite)
+├── public/
+│   ├── index.html      # Static demo UI
+│   └── assets/         # UI assets (screenshot, etc.)
+├── tests/
+│   └── test_api.py     # API tests
+├── scripts/
+│   └── run_demo.ps1    # Quick demo launcher
+├── app.py              # Gradio UI (optional local interface)
+├── dev-requirements.txt # Lightweight dependencies (FastAPI, pytest, etc.)
+├── vercel.json         # Vercel deployment config
+└── README.md
+```
 
-## Deploying (Vercel)
+## Environment Variables
 
-The repo includes a `vercel.json` to serve the static site and Python serverless functions. To publish a public demo on Vercel:
+### Core Settings
 
-1. (Optional) Configure environment variables in the Vercel project settings:
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `DEMO_MODE` | Enable demo responses (no external services) | `0` | No |
+| `INFERENCE_API_URL` | URL of hosted inference endpoint | - | No (required for real inference) |
+| `INFERENCE_API_KEY` | Bearer token for inference API | - | No |
 
-   - `DEMO_MODE=1` — run demo-mode responses without external services.
-   - `INFERENCE_API_URL` / `INFERENCE_API_KEY` — optional: if you have an external text-generation service, set these to enable real responses.
+### Rate Limiting
 
-2. Deploy with the Vercel CLI or the Vercel dashboard. From the repo root:
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `RATE_LIMIT_REQUESTS` | Max requests per window | `10` |
+| `RATE_LIMIT_WINDOW` | Window size in seconds | `60` |
 
+### Storage
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `HISTORY_DB_PATH` | SQLite database path | `conversation_history.db` |
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Set environment variables in Vercel project settings:
+   - `DEMO_MODE=1` (for public demo)
+   - Or `INFERENCE_API_URL` + `INFERENCE_API_KEY` (for real inference)
+
+2. Deploy:
 ```powershell
 vercel --prod
 ```
 
-When `DEMO_MODE` is set, the deployed site will return safe demo responses and requires no external services or keys.
+The `vercel.json` config automatically serves `public/` as static files and `api/*.py` as Python serverless functions.
 
-## Testing and CI
+### Hugging Face Spaces
 
-Run the lightweight tests locally after installing dev dependencies:
+1. In Space Settings:
+   - Set Branch to `demo`
+   - Add environment variable: `DEMO_MODE` = `1`
+   - Restart the Space
+
+2. Or use the `main` branch with `INFERENCE_API_URL` configured to call a hosted model.
+
+### One-Click Deploy
+
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/Zwin-ux/Eidolon-Cognitive-Tutor)
+
+## API Reference
+
+### POST `/api/ask`
+
+Request body:
+```json
+{
+  "prompt": "Your question here",
+  "max_tokens": 512,
+  "temperature": 0.7,
+  "session_id": "optional-session-id"
+}
+```
+
+Response:
+```json
+{
+  "result": "Response text",
+  "source": "demo",
+  "session_id": "generated-or-provided-session-id"
+}
+```
+
+### GET `/api/history/{session_id}`
+
+Retrieve conversation history for a session.
+
+Response:
+```json
+{
+  "session_id": "...",
+  "history": [
+    {
+      "prompt": "...",
+      "response": "...",
+      "source": "demo",
+      "timestamp": "2025-11-06 12:34:56"
+    }
+  ]
+}
+```
+
+## Testing
+
+Run the test suite:
 
 ```powershell
 pip install -r dev-requirements.txt
-pytest -q
+pytest -v
 ```
 
-CI is configured to run the same test and lint steps on push/pull requests.
+CI is configured via `.github/workflows/ci.yml` and runs automatically on push/PR.
 
-## Presenting this repository
+## Development
 
-For public presentations or a minimal demo, set `DEMO_MODE=1` and deploy to Vercel or run the local demo script. The UI and API are designed so reviewers can interact with the demo without installing large models or sharing API keys.
+### Running with a Real Inference Backend
 
-If you want the README even shorter or want me to remove files not needed for the public demo, tell me which files to remove and I will prepare a clean branch for presentation.
+Set environment variables and run:
 
-## Results & development stage (short)
+```powershell
+$env:INFERENCE_API_URL = "https://api-inference.huggingface.co/models/your-org/your-model"
+$env:INFERENCE_API_KEY = "hf_..."
+python app.py
+```
 
-- Demo responses: canned, deterministic outputs returned when `DEMO_MODE=1`. They are designed to show typical short explanations and step-by-step answers (e.g., brief summaries, simple how-tos). The API returns a JSON object with a `result` string.
-- Current stage: demo-ready for public presentation. CI (lightweight) and demo UI are configured. The full model code remains in the main branch for development but is removed from this `demo` branch to keep the presentation lightweight.
+The API will automatically retry failed requests and fall back to demo mode if the backend is unavailable.
 
-## One-click deploy (optional)
+### Conversation History
 
-Click to create a Vercel project from this repository:
+History is stored in SQLite (`conversation_history.db` by default). The UI includes a "View History" button that loads past conversations for the current session.
 
-[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/Zwin-ux/Eidolon)
+## Production Recommendations
+
+- **Inference Backend**: Use a hosted service (Hugging Face Inference Endpoints, Replicate, or self-hosted container) rather than loading models in serverless functions.
+- **Rate Limiting**: Adjust `RATE_LIMIT_REQUESTS` and `RATE_LIMIT_WINDOW` based on your traffic expectations.
+- **Caching**: Consider adding Redis or similar for distributed rate limiting in multi-instance deployments.
+- **Authentication**: Add API key authentication for production usage (not included in demo).
+- **Monitoring**: Set up logging and error tracking (Sentry, Datadog, etc.).
+
+## Current Stage
+
+**Demo-ready for public presentation.** Key milestones:
+
+- ✅ Demo mode with safe, deterministic responses
+- ✅ External inference adapter with retries
+- ✅ Conversation history storage
+- ✅ Rate limiting
+- ✅ Modern, interactive UI
+- ✅ CI/CD with tests and linting
+- ✅ One-click deployment options
+
+## Troubleshooting
+
+### "Repository Not Found" error on Hugging Face Spaces
+
+- **Cause**: The Space is trying to load a model at startup (e.g., `Qwen/Qwen3-7B-Instruct`) but the model is gated, private, or doesn't exist.
+- **Fix**: Set `DEMO_MODE=1` in Space environment variables and restart, or switch the Space to use the `demo` branch.
+
+### Rate limit errors in testing
+
+- **Cause**: Default rate limit is 10 requests per 60 seconds.
+- **Fix**: Set `RATE_LIMIT_REQUESTS=100` or higher when running local tests.
+
+### Conversation history not persisting
+
+- **Cause**: SQLite database may not be writable in some serverless environments.
+- **Fix**: Set `HISTORY_DB_PATH` to a writable location or use an external database (Postgres, etc.) for production.
+
+## Contributing
+
+Issues and PRs welcome at https://github.com/Zwin-ux/Eidolon-Cognitive-Tutor
+
+## License
+
+Apache 2.0

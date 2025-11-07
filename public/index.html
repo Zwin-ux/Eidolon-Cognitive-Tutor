@@ -5,53 +5,194 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Eidolon Cognitive Tutor</title>
     <style>
-      body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background:#f7f8fb; color:#0f1724; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0 }
-      .card { background:#fff; padding:28px; border-radius:12px; box-shadow:0 6px 30px rgba(20,20,40,0.08); width:720px; max-width:92% }
-      h1 { margin:0 0 8px 0; font-size:20px }
-      p.lead { margin:0 0 20px 0; color:#475569 }
-      textarea { width:100%; height:140px; padding:12px; border-radius:8px; border:1px solid #e6e9ef; resize:vertical; font-size:14px }
-      button { background:#0b84ff; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:600; cursor:pointer }
-      .out { margin-top:16px; padding:12px; border-radius:8px; background:#f1f5f9; min-height:80px; white-space:pre-wrap }
-      .meta { display:flex; gap:8px; margin-top:12px }
-      .small { font-size:13px; color:#64748b }
+      * { box-sizing: border-box; }
+      body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background:#f7f8fb; color:#0f1724; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; padding:20px }
+      .card { background:#fff; padding:32px; border-radius:16px; box-shadow:0 6px 40px rgba(20,20,40,0.1); width:820px; max-width:100% }
+      h1 { margin:0 0 8px 0; font-size:24px; font-weight:700 }
+      p.lead { margin:0 0 24px 0; color:#475569; line-height:1.5 }
+      .examples { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px }
+      .example-btn { background:#e0e7ff; color:#3730a3; border:none; padding:8px 14px; border-radius:8px; font-size:13px; cursor:pointer; transition:all 0.2s }
+      .example-btn:hover { background:#c7d2fe; transform:translateY(-1px) }
+      textarea { width:100%; height:140px; padding:14px; border-radius:10px; border:1px solid #e6e9ef; resize:vertical; font-size:15px; font-family:inherit; transition:border 0.2s }
+      textarea:focus { outline:none; border-color:#0b84ff }
+      .controls { display:flex; gap:10px; margin-top:14px; align-items:center }
+      button.primary { background:#0b84ff; color:white; border:none; padding:12px 20px; border-radius:10px; font-weight:600; cursor:pointer; font-size:15px; transition:all 0.2s }
+      button.primary:hover { background:#0070e0; transform:translateY(-1px); box-shadow:0 4px 12px rgba(11,132,255,0.3) }
+      button.primary:disabled { background:#cbd5e1; cursor:not-allowed; transform:none }
+      button.secondary { background:#f1f5f9; color:#334155; border:none; padding:10px 16px; border-radius:8px; cursor:pointer; font-size:14px; transition:all 0.2s }
+      button.secondary:hover { background:#e2e8f0 }
+      .out { margin-top:20px; padding:16px; border-radius:10px; background:#f8fafc; min-height:100px; white-space:pre-wrap; border:1px solid #e2e8f0; position:relative }
+      .out.loading { background:#fef3c7; border-color:#fde047 }
+      .out.error { background:#fee; border-color:#fca5a5 }
+      .spinner { display:inline-block; width:16px; height:16px; border:2px solid #cbd5e1; border-top-color:#0b84ff; border-radius:50%; animation:spin 0.7s linear infinite; margin-right:8px }
+      @keyframes spin { to { transform: rotate(360deg) } }
+      .copy-btn { position:absolute; top:12px; right:12px; background:#fff; border:1px solid #e2e8f0; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:all 0.2s }
+      .copy-btn:hover { background:#f1f5f9; border-color:#cbd5e1 }
+      .history { margin-top:24px; padding-top:24px; border-top:1px solid #e2e8f0 }
+      .history h3 { margin:0 0 12px 0; font-size:16px; color:#64748b }
+      .history-item { background:#f8fafc; padding:10px; border-radius:8px; margin-bottom:8px; font-size:13px; border-left:3px solid #0b84ff }
+      .meta { font-size:13px; color:#64748b; margin-top:8px }
     </style>
   </head>
   <body>
     <div class="card">
-  <h1>Eidolon — Demo</h1>
-  <p class="lead">Quick, presentable demo of the interactive tutor interface (DEMO_MODE).</p>
+      <h1>🧠 Eidolon Cognitive Tutor</h1>
+      <p class="lead">Interactive tutor demo powered by adaptive responses. Try the examples below or ask your own question.</p>
 
-  <img src="/public/assets/demo-screenshot.svg" alt="Demo screenshot" style="width:100%; border-radius:8px; margin-bottom:12px; box-shadow:0 8px 24px rgba(16,24,40,0.06)" />
-
-  <textarea id="prompt" placeholder="Type a sample prompt, e.g. 'Explain Newton's laws in simple terms'" ></textarea>
-      <div class="meta">
-        <button id="ask">Ask tutor</button>
-  <div class="small">Set `DEMO_MODE` on the server to enable safe demo responses (no external services required).</div>
+      <div class="examples">
+        <button class="example-btn" data-prompt="Explain Newton's laws in simple terms">📐 Newton's Laws</button>
+        <button class="example-btn" data-prompt="How do I implement a binary search in Python?">💻 Binary Search</button>
+        <button class="example-btn" data-prompt="Compare supervised vs unsupervised learning">🤖 ML Comparison</button>
+        <button class="example-btn" data-prompt="What is the difference between HTTP and HTTPS?">🔒 HTTP vs HTTPS</button>
       </div>
 
-      <div class="out" id="out">Awaiting question...</div>
+      <textarea id="prompt" placeholder="Type your question here..."></textarea>
+      
+      <div class="controls">
+        <button id="ask" class="primary">Ask Tutor</button>
+        <button id="clear" class="secondary">Clear</button>
+        <button id="history-btn" class="secondary">View History</button>
+      </div>
+
+      <div class="out" id="out">Awaiting your question...</div>
+
+      <div class="history" id="history" style="display:none">
+        <h3>Recent Conversations</h3>
+        <div id="history-list"></div>
+      </div>
+
+      <div class="meta">
+        <span id="status">Demo mode active</span> | 
+        <a href="https://github.com/Zwin-ux/Eidolon-Cognitive-Tutor" target="_blank" style="color:#0b84ff; text-decoration:none">View on GitHub</a>
+      </div>
     </div>
 
     <script>
       const btn = document.getElementById('ask');
+      const clearBtn = document.getElementById('clear');
+      const historyBtn = document.getElementById('history-btn');
       const out = document.getElementById('out');
       const promptEl = document.getElementById('prompt');
+      const statusEl = document.getElementById('status');
+      const historyEl = document.getElementById('history');
+      const historyList = document.getElementById('history-list');
+      
+      let sessionId = localStorage.getItem('session_id') || '';
+      let conversationHistory = [];
 
+      // Example button handlers
+      document.querySelectorAll('.example-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          promptEl.value = btn.dataset.prompt;
+          promptEl.focus();
+        });
+      });
+
+      // Copy button
+      function addCopyButton() {
+        if (document.querySelector('.copy-btn')) return;
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.textContent = 'Copy';
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(out.textContent);
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => copyBtn.textContent = 'Copy', 2000);
+        };
+        out.appendChild(copyBtn);
+      }
+
+      // Clear functionality
+      clearBtn.addEventListener('click', () => {
+        promptEl.value = '';
+        out.textContent = 'Awaiting your question...';
+        out.className = 'out';
+        const copyBtn = out.querySelector('.copy-btn');
+        if (copyBtn) copyBtn.remove();
+      });
+
+      // History toggle
+      historyBtn.addEventListener('click', () => {
+        if (historyEl.style.display === 'none') {
+          loadHistory();
+          historyEl.style.display = 'block';
+          historyBtn.textContent = 'Hide History';
+        } else {
+          historyEl.style.display = 'none';
+          historyBtn.textContent = 'View History';
+        }
+      });
+
+      // Load history from server
+      async function loadHistory() {
+        if (!sessionId) return;
+        try {
+          const resp = await fetch(`/api/history/${sessionId}`);
+          const data = await resp.json();
+          if (data.history && data.history.length > 0) {
+            historyList.innerHTML = data.history.map(item => 
+              `<div class="history-item"><strong>Q:</strong> ${item.prompt.substring(0, 60)}...<br><strong>A:</strong> ${item.response.substring(0, 80)}...</div>`
+            ).join('');
+          } else {
+            historyList.innerHTML = '<div style="color:#94a3b8">No conversation history yet.</div>';
+          }
+        } catch (e) {
+          historyList.innerHTML = '<div style="color:#94a3b8">Could not load history.</div>';
+        }
+      }
+
+      // Main ask functionality
       btn.addEventListener('click', async () => {
         const prompt = promptEl.value.trim();
-        if (!prompt) { out.textContent = 'Please enter a question.'; return }
-        out.textContent = 'Thinking...';
+        if (!prompt) { 
+          out.textContent = 'Please enter a question.';
+          out.className = 'out error';
+          return;
+        }
+        
+        out.innerHTML = '<span class="spinner"></span>Thinking...';
+        out.className = 'out loading';
+        btn.disabled = true;
+        
         try {
           const resp = await fetch('/api/ask', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt })
+            body: JSON.stringify({ 
+              prompt,
+              session_id: sessionId || undefined
+            })
           });
+          
           const data = await resp.json();
-          if (data.error) out.textContent = 'Error: ' + (data.detail || data.error);
-          else out.textContent = data.result || JSON.stringify(data.result, null, 2);
+          
+          if (data.session_id && !sessionId) {
+            sessionId = data.session_id;
+            localStorage.setItem('session_id', sessionId);
+          }
+          
+          if (data.error) {
+            out.textContent = '❌ Error: ' + (data.detail || data.error);
+            out.className = 'out error';
+          } else {
+            out.textContent = data.result || JSON.stringify(data, null, 2);
+            out.className = 'out';
+            addCopyButton();
+            statusEl.textContent = `Response from: ${data.source}`;
+            conversationHistory.push({ prompt, response: data.result });
+          }
         } catch (e) {
-          out.textContent = 'Request failed: ' + e.message;
+          out.textContent = '❌ Request failed: ' + e.message;
+          out.className = 'out error';
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      // Enter key to submit
+      promptEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && e.ctrlKey) {
+          btn.click();
         }
       });
     </script>
