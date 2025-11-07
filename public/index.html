@@ -3,198 +3,670 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Eidolon Cognitive Tutor</title>
+    <title>Eidolon Cognitive Tutor - Learn Anything, Your Way</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-      * { box-sizing: border-box; }
-      body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background:#f7f8fb; color:#0f1724; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; padding:20px }
-      .card { background:#fff; padding:32px; border-radius:16px; box-shadow:0 6px 40px rgba(20,20,40,0.1); width:820px; max-width:100% }
-      h1 { margin:0 0 8px 0; font-size:24px; font-weight:700 }
-      p.lead { margin:0 0 24px 0; color:#475569; line-height:1.5 }
-      .examples { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px }
-      .example-btn { background:#e0e7ff; color:#3730a3; border:none; padding:8px 14px; border-radius:8px; font-size:13px; cursor:pointer; transition:all 0.2s }
-      .example-btn:hover { background:#c7d2fe; transform:translateY(-1px) }
-      textarea { width:100%; height:140px; padding:14px; border-radius:10px; border:1px solid #e6e9ef; resize:vertical; font-size:15px; font-family:inherit; transition:border 0.2s }
-      textarea:focus { outline:none; border-color:#0b84ff }
-      .controls { display:flex; gap:10px; margin-top:14px; align-items:center }
-      button.primary { background:#0b84ff; color:white; border:none; padding:12px 20px; border-radius:10px; font-weight:600; cursor:pointer; font-size:15px; transition:all 0.2s }
-      button.primary:hover { background:#0070e0; transform:translateY(-1px); box-shadow:0 4px 12px rgba(11,132,255,0.3) }
-      button.primary:disabled { background:#cbd5e1; cursor:not-allowed; transform:none }
-      button.secondary { background:#f1f5f9; color:#334155; border:none; padding:10px 16px; border-radius:8px; cursor:pointer; font-size:14px; transition:all 0.2s }
-      button.secondary:hover { background:#e2e8f0 }
-      .out { margin-top:20px; padding:16px; border-radius:10px; background:#f8fafc; min-height:100px; white-space:pre-wrap; border:1px solid #e2e8f0; position:relative }
-      .out.loading { background:#fef3c7; border-color:#fde047 }
-      .out.error { background:#fee; border-color:#fca5a5 }
-      .spinner { display:inline-block; width:16px; height:16px; border:2px solid #cbd5e1; border-top-color:#0b84ff; border-radius:50%; animation:spin 0.7s linear infinite; margin-right:8px }
-      @keyframes spin { to { transform: rotate(360deg) } }
-      .copy-btn { position:absolute; top:12px; right:12px; background:#fff; border:1px solid #e2e8f0; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:all 0.2s }
-      .copy-btn:hover { background:#f1f5f9; border-color:#cbd5e1 }
-      .history { margin-top:24px; padding-top:24px; border-top:1px solid #e2e8f0 }
-      .history h3 { margin:0 0 12px 0; font-size:16px; color:#64748b }
-      .history-item { background:#f8fafc; padding:10px; border-radius:8px; margin-bottom:8px; font-size:13px; border-left:3px solid #0b84ff }
-      .meta { font-size:13px; color:#64748b; margin-top:8px }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { 
+        font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh; 
+        padding: 20px;
+        color: #1a202c;
+      }
+      
+      .container { max-width: 1200px; margin: 0 auto; }
+      
+      .header { text-align: center; margin-bottom: 40px; color: white; }
+      .header h1 { font-size: 42px; font-weight: 700; margin-bottom: 12px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+      .header .tagline { font-size: 18px; opacity: 0.95; }
+      
+      .stats-bar { 
+        display: flex; 
+        gap: 20px; 
+        justify-content: center; 
+        margin-bottom: 30px; 
+        flex-wrap: wrap;
+      }
+      .stat-card { 
+        background: rgba(255,255,255,0.2); 
+        backdrop-filter: blur(10px);
+        padding: 15px 25px; 
+        border-radius: 12px; 
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+      }
+      .stat-value { font-size: 24px; font-weight: 700; }
+      .stat-label { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+      
+      .main-card { 
+        background: white; 
+        border-radius: 20px; 
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        overflow: hidden;
+      }
+      
+      .mode-selector {
+        display: flex;
+        gap: 10px;
+        padding: 20px;
+        background: linear-gradient(to right, #f7fafc, #edf2f7);
+        border-bottom: 2px solid #e2e8f0;
+        overflow-x: auto;
+      }
+      .mode-btn {
+        padding: 12px 20px;
+        border: 2px solid #cbd5e1;
+        background: white;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .mode-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+      .mode-btn.active { 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        color: white; 
+        border-color: #667eea;
+      }
+      
+      .controls-panel {
+        padding: 20px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      .control-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+      .control-item label { 
+        display: block; 
+        font-size: 13px; 
+        font-weight: 600; 
+        color: #475569; 
+        margin-bottom: 8px;
+      }
+      .persona-selector {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .persona-btn {
+        padding: 8px 16px;
+        border: 2px solid #e2e8f0;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.2s;
+      }
+      .persona-btn:hover { border-color: #cbd5e1; }
+      .persona-btn.active { background: #667eea; color: white; border-color: #667eea; }
+      
+      .slider-container { position: relative; }
+      .slider {
+        width: 100%;
+        height: 8px;
+        border-radius: 5px;
+        background: linear-gradient(to right, #48bb78, #f6ad55, #f56565);
+        outline: none;
+        -webkit-appearance: none;
+      }
+      .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: white;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        border: 3px solid #667eea;
+      }
+      .difficulty-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: #64748b;
+        margin-top: 6px;
+      }
+      
+      .chat-area {
+        padding: 30px;
+        min-height: 400px;
+      }
+      
+      .prompt-enhance {
+        background: #fef3c7;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        border-left: 4px solid #f59e0b;
+        display: none;
+      }
+      .prompt-enhance.show { display: block; }
+      
+      textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 15px;
+        font-family: inherit;
+        resize: vertical;
+        transition: border 0.2s;
+      }
+      textarea:focus { outline: none; border-color: #667eea; }
+      
+      .action-bar {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 15px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+      }
+      .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5); }
+      .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+      
+      .btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        border: 2px solid #e2e8f0;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+      .btn-secondary:hover { background: #e2e8f0; }
+      
+      .response-area {
+        margin-top: 24px;
+        padding: 20px;
+        background: #f8fafc;
+        border-radius: 12px;
+        min-height: 150px;
+        border: 2px solid #e2e8f0;
+        position: relative;
+      }
+      .response-area.loading { background: linear-gradient(90deg, #f8fafc 0%, #edf2f7 50%, #f8fafc 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+      @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+      
+      .typing-indicator { display: none; align-items: center; gap: 6px; color: #64748b; }
+      .typing-indicator.show { display: flex; }
+      .typing-dot { width: 8px; height: 8px; background: #94a3b8; border-radius: 50%; animation: bounce 1.4s infinite; }
+      .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+      .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+      @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
+      
+      .response-text { line-height: 1.7; white-space: pre-wrap; }
+      .response-text code { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
+      
+      .response-actions {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        display: flex;
+        gap: 8px;
+      }
+      .icon-btn {
+        background: white;
+        border: 1px solid #e2e8f0;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.2s;
+      }
+      .icon-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+      
+      .examples-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin-top: 20px;
+      }
+      .example-card {
+        background: white;
+        border: 2px solid #e2e8f0;
+        padding: 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+      }
+      .example-card:hover { 
+        border-color: #667eea; 
+        transform: translateY(-2px); 
+        box-shadow: 0 4px 12px rgba(102,126,234,0.2);
+      }
+      
+      .achievement-popup {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        border: 2px solid #48bb78;
+        transform: translateX(400px);
+        transition: transform 0.4s;
+        z-index: 1000;
+        max-width: 300px;
+      }
+      .achievement-popup.show { transform: translateX(0); }
+      .achievement-icon { font-size: 48px; text-align: center; margin-bottom: 10px; }
+      .achievement-title { font-weight: 700; font-size: 18px; margin-bottom: 6px; }
+      .achievement-desc { font-size: 14px; color: #64748b; }
+      
+      @media (max-width: 768px) {
+        .header h1 { font-size: 32px; }
+        .mode-selector { flex-wrap: nowrap; padding: 15px; }
+        .stat-card { padding: 10px 15px; }
+      }
     </style>
   </head>
   <body>
-    <div class="card">
-      <h1>🧠 Eidolon Cognitive Tutor</h1>
-      <p class="lead">Interactive tutor demo powered by adaptive responses. Try the examples below or ask your own question.</p>
-
-      <div class="examples">
-        <button class="example-btn" data-prompt="Explain Newton's laws in simple terms">📐 Newton's Laws</button>
-        <button class="example-btn" data-prompt="How do I implement a binary search in Python?">💻 Binary Search</button>
-        <button class="example-btn" data-prompt="Compare supervised vs unsupervised learning">🤖 ML Comparison</button>
-        <button class="example-btn" data-prompt="What is the difference between HTTP and HTTPS?">🔒 HTTP vs HTTPS</button>
+    <div class="container">
+      <div class="header">
+        <h1>🧠 Eidolon Cognitive Tutor</h1>
+        <div class="tagline">Learn Anything, Your Way — Personalized, Interactive, Engaging</div>
       </div>
 
-      <textarea id="prompt" placeholder="Type your question here..."></textarea>
-      
-      <div class="controls">
-        <button id="ask" class="primary">Ask Tutor</button>
-        <button id="clear" class="secondary">Clear</button>
-        <button id="history-btn" class="secondary">View History</button>
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-value" id="question-count">0</div>
+          <div class="stat-label">Questions Asked</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="streak-count">0🔥</div>
+          <div class="stat-label">Learning Streak</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="achievement-count">0🏆</div>
+          <div class="stat-label">Achievements</div>
+        </div>
       </div>
 
-      <div class="out" id="out">Awaiting your question...</div>
+      <div class="main-card">
+        <div class="mode-selector" id="mode-selector">
+          <button class="mode-btn active" data-mode="standard">
+            <span>📚</span> Standard
+          </button>
+          <button class="mode-btn" data-mode="socratic">
+            <span>🤔</span> Socratic
+          </button>
+          <button class="mode-btn" data-mode="eli5">
+            <span>👶</span> ELI5
+          </button>
+          <button class="mode-btn" data-mode="technical">
+            <span>🔬</span> Technical
+          </button>
+          <button class="mode-btn" data-mode="analogy">
+            <span>🎭</span> Analogy
+          </button>
+          <button class="mode-btn" data-mode="code">
+            <span>💻</span> Code
+          </button>
+        </div>
 
-      <div class="history" id="history" style="display:none">
-        <h3>Recent Conversations</h3>
-        <div id="history-list"></div>
-      </div>
+        <div class="controls-panel">
+          <div class="control-group">
+            <div class="control-item">
+              <label>Difficulty Level</label>
+              <div class="slider-container">
+                <input type="range" min="1" max="5" value="3" class="slider" id="difficulty-slider">
+                <div class="difficulty-labels">
+                  <span>Beginner</span>
+                  <span>Intermediate</span>
+                  <span>Expert</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="control-item">
+              <label>Tutor Persona</label>
+              <div class="persona-selector">
+                <button class="persona-btn active" data-persona="friendly">😊 Friendly</button>
+                <button class="persona-btn" data-persona="strict">📚 Strict</button>
+                <button class="persona-btn" data-persona="enthusiastic">🎉 Hyped</button>
+                <button class="persona-btn" data-persona="professional">🎓 Pro</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <div class="meta">
-        <span id="status">Demo mode active</span> | 
-        <a href="https://github.com/Zwin-ux/Eidolon-Cognitive-Tutor" target="_blank" style="color:#0b84ff; text-decoration:none">View on GitHub</a>
+        <div class="chat-area">
+          <div class="prompt-enhance" id="prompt-enhance">
+            💡 <strong>Suggestion:</strong> <span id="enhance-text"></span>
+          </div>
+          
+          <textarea 
+            id="prompt" 
+            placeholder="Ask anything... Try 'Explain quantum computing' or 'How do I build a REST API?'"
+          ></textarea>
+
+          <div class="action-bar">
+            <button class="btn-primary" id="ask-btn">
+              <span id="ask-text">Ask Tutor</span>
+            </button>
+            <button class="btn-secondary" id="enhance-btn">✨ Enhance Prompt</button>
+            <button class="btn-secondary" id="clear-btn">🗑️ Clear</button>
+            <button class="btn-secondary" id="surprise-btn">🎲 Surprise Me</button>
+          </div>
+
+          <div class="response-area" id="response-area">
+            <div class="typing-indicator" id="typing-indicator">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <span style="margin-left: 8px;">Thinking...</span>
+            </div>
+            <div class="response-text" id="response-text">Your tutor is ready! Pick a learning mode and ask away 🚀</div>
+            <div class="response-actions" style="display:none" id="response-actions">
+              <button class="icon-btn" id="copy-btn">📋 Copy</button>
+              <button class="icon-btn" id="share-btn">🔗 Share</button>
+              <button class="icon-btn" id="regenerate-btn">🔄 Regenerate</button>
+            </div>
+          </div>
+
+          <div class="examples-grid">
+            <div class="example-card" data-example="Explain Newton's laws in simple terms">
+              📐 Newton's Laws
+            </div>
+            <div class="example-card" data-example="How do I implement binary search?">
+              💻 Binary Search
+            </div>
+            <div class="example-card" data-example="Compare supervised vs unsupervised learning">
+              🤖 ML Comparison
+            </div>
+            <div class="example-card" data-example="What's the difference between HTTP and HTTPS?">
+              🔒 HTTP vs HTTPS
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <script>
-      const btn = document.getElementById('ask');
-      const clearBtn = document.getElementById('clear');
-      const historyBtn = document.getElementById('history-btn');
-      const out = document.getElementById('out');
-      const promptEl = document.getElementById('prompt');
-      const statusEl = document.getElementById('status');
-      const historyEl = document.getElementById('history');
-      const historyList = document.getElementById('history-list');
-      
-      let sessionId = localStorage.getItem('session_id') || '';
-      let conversationHistory = [];
+    <div class="achievement-popup" id="achievement-popup">
+      <div class="achievement-icon">🏆</div>
+      <div class="achievement-title" id="achievement-title">Achievement Unlocked!</div>
+      <div class="achievement-desc" id="achievement-desc">You've earned a new badge</div>
+    </div>
 
-      // Example button handlers
-      document.querySelectorAll('.example-btn').forEach(btn => {
+    <script>
+      // State
+      let selectedMode = 'standard';
+      let selectedPersona = 'friendly';
+      let difficulty = 3;
+      let sessionId = localStorage.getItem('session_id') || '';
+      let questionCount = parseInt(localStorage.getItem('question_count') || '0');
+      let achievements = JSON.parse(localStorage.getItem('achievements') || '[]');
+      let lastQuestionTime = Date.now();
+
+      // Elements
+      const promptEl = document.getElementById('prompt');
+      const askBtn = document.getElementById('ask-btn');
+      const responseArea = document.getElementById('response-area');
+      const responseText = document.getElementById('response-text');
+      const typingIndicator = document.getElementById('typing-indicator');
+      const responseActions = document.getElementById('response-actions');
+
+      // Update stats
+      document.getElementById('question-count').textContent = questionCount;
+      document.getElementById('achievement-count').textContent = achievements.length + '🏆';
+      
+      // Calculate streak
+      function updateStreak() {
+        const now = Date.now();
+        const hoursSinceLastQuestion = (now - lastQuestionTime) / (1000 * 60 * 60);
+        let streak = parseInt(localStorage.getItem('streak') || '1');
+        if (hoursSinceLastQuestion < 24) {
+          streak++;
+          localStorage.setItem('streak', streak);
+        } else if (hoursSinceLastQuestion > 48) {
+          streak = 1;
+          localStorage.setItem('streak', '1');
+        }
+        document.getElementById('streak-count').textContent = streak + '🔥';
+      }
+      updateStreak();
+
+      // Mode selection
+      document.querySelectorAll('.mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          promptEl.value = btn.dataset.prompt;
+          document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          selectedMode = btn.dataset.mode;
+        });
+      });
+
+      // Persona selection
+      document.querySelectorAll('.persona-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          selectedPersona = btn.dataset.persona;
+        });
+      });
+
+      // Difficulty slider
+      document.getElementById('difficulty-slider').addEventListener('input', (e) => {
+        difficulty = parseInt(e.target.value);
+      });
+
+      // Example cards
+      document.querySelectorAll('.example-card').forEach(card => {
+        card.addEventListener('click', () => {
+          promptEl.value = card.dataset.example;
           promptEl.focus();
         });
       });
 
-      // Copy button
-      function addCopyButton() {
-        if (document.querySelector('.copy-btn')) return;
-        const copyBtn = document.createElement('button');
-        copyBtn.className = 'copy-btn';
-        copyBtn.textContent = 'Copy';
-        copyBtn.onclick = () => {
-          navigator.clipboard.writeText(out.textContent);
-          copyBtn.textContent = 'Copied!';
-          setTimeout(() => copyBtn.textContent = 'Copy', 2000);
-        };
-        out.appendChild(copyBtn);
-      }
-
-      // Clear functionality
-      clearBtn.addEventListener('click', () => {
-        promptEl.value = '';
-        out.textContent = 'Awaiting your question...';
-        out.className = 'out';
-        const copyBtn = out.querySelector('.copy-btn');
-        if (copyBtn) copyBtn.remove();
-      });
-
-      // History toggle
-      historyBtn.addEventListener('click', () => {
-        if (historyEl.style.display === 'none') {
-          loadHistory();
-          historyEl.style.display = 'block';
-          historyBtn.textContent = 'Hide History';
-        } else {
-          historyEl.style.display = 'none';
-          historyBtn.textContent = 'View History';
-        }
-      });
-
-      // Load history from server
-      async function loadHistory() {
-        if (!sessionId) return;
-        try {
-          const resp = await fetch(`/api/history/${sessionId}`);
-          const data = await resp.json();
-          if (data.history && data.history.length > 0) {
-            historyList.innerHTML = data.history.map(item => 
-              `<div class="history-item"><strong>Q:</strong> ${item.prompt.substring(0, 60)}...<br><strong>A:</strong> ${item.response.substring(0, 80)}...</div>`
-            ).join('');
-          } else {
-            historyList.innerHTML = '<div style="color:#94a3b8">No conversation history yet.</div>';
-          }
-        } catch (e) {
-          historyList.innerHTML = '<div style="color:#94a3b8">Could not load history.</div>';
-        }
-      }
-
-      // Main ask functionality
-      btn.addEventListener('click', async () => {
+      // Enhance prompt
+      document.getElementById('enhance-btn').addEventListener('click', () => {
         const prompt = promptEl.value.trim();
-        if (!prompt) { 
-          out.textContent = 'Please enter a question.';
-          out.className = 'out error';
+        if (!prompt) return;
+        
+        const enhancements = [
+          `Can you explain ${prompt} with examples and use cases?`,
+          `Please provide a detailed explanation of ${prompt}, including practical applications.`,
+          `I'd like to understand ${prompt} - can you break it down step by step?`,
+          `What are the key concepts behind ${prompt} and how do they relate to each other?`
+        ];
+        const enhanced = enhancements[Math.floor(Math.random() * enhancements.length)];
+        
+        document.getElementById('enhance-text').textContent = enhanced;
+        document.getElementById('prompt-enhance').classList.add('show');
+        
+        setTimeout(() => {
+          if (confirm('Apply this enhanced prompt?')) {
+            promptEl.value = enhanced;
+          }
+          document.getElementById('prompt-enhance').classList.remove('show');
+        }, 3000);
+      });
+
+      // Surprise me
+      document.getElementById('surprise-btn').addEventListener('click', () => {
+        const surprises = [
+          "Explain the concept of emergence in complex systems",
+          "How does the human brain process and store memories?",
+          "What would happen if we could travel faster than light?",
+          "Explain blockchain technology using an everyday analogy",
+          "How do neural networks learn from data?",
+          "What is the halting problem and why is it unsolvable?"
+        ];
+        promptEl.value = surprises[Math.floor(Math.random() * surprises.length)];
+      });
+
+      // Clear
+      document.getElementById('clear-btn').addEventListener('click', () => {
+        promptEl.value = '';
+        responseText.textContent = 'Your tutor is ready! Pick a learning mode and ask away 🚀';
+        responseActions.style.display = 'none';
+      });
+
+      // Copy
+      document.getElementById('copy-btn').addEventListener('click', () => {
+        navigator.clipboard.writeText(responseText.textContent);
+        document.getElementById('copy-btn').textContent = '✅ Copied!';
+        setTimeout(() => {
+          document.getElementById('copy-btn').textContent = '📋 Copy';
+        }, 2000);
+      });
+
+      // Main ask function with typing animation
+      async function askQuestion() {
+        const prompt = promptEl.value.trim();
+        if (!prompt) {
+          alert('Please enter a question!');
           return;
         }
-        
-        out.innerHTML = '<span class="spinner"></span>Thinking...';
-        out.className = 'out loading';
-        btn.disabled = true;
-        
+
+        askBtn.disabled = true;
+        document.getElementById('ask-text').textContent = 'Thinking...';
+        responseArea.classList.add('loading');
+        typingIndicator.classList.add('show');
+        responseText.textContent = '';
+        responseActions.style.display = 'none';
+
         try {
           const resp = await fetch('/api/ask', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
               prompt,
+              mode: selectedMode,
+              difficulty,
+              persona: selectedPersona,
               session_id: sessionId || undefined
             })
           });
-          
+
           const data = await resp.json();
-          
+
           if (data.session_id && !sessionId) {
             sessionId = data.session_id;
             localStorage.setItem('session_id', sessionId);
           }
-          
+
+          typingIndicator.classList.remove('show');
+
           if (data.error) {
-            out.textContent = '❌ Error: ' + (data.detail || data.error);
-            out.className = 'out error';
+            responseText.textContent = '❌ ' + data.error;
           } else {
-            out.textContent = data.result || JSON.stringify(data, null, 2);
-            out.className = 'out';
-            addCopyButton();
-            statusEl.textContent = `Response from: ${data.source}`;
-            conversationHistory.push({ prompt, response: data.result });
+            // Typing animation
+            const fullText = data.result;
+            let index = 0;
+            responseText.textContent = '';
+            
+            const typeInterval = setInterval(() => {
+              if (index < fullText.length) {
+                responseText.textContent += fullText[index];
+                index++;
+              } else {
+                clearInterval(typeInterval);
+                responseActions.style.display = 'flex';
+              }
+            }, 15);
+
+            // Update stats
+            questionCount++;
+            localStorage.setItem('question_count', questionCount);
+            document.getElementById('question-count').textContent = questionCount;
+            lastQuestionTime = Date.now();
+            updateStreak();
+
+            // Check achievements
+            checkAchievements();
           }
         } catch (e) {
-          out.textContent = '❌ Request failed: ' + e.message;
-          out.className = 'out error';
+          typingIndicator.classList.remove('show');
+          responseText.textContent = '❌ Request failed: ' + e.message;
         } finally {
-          btn.disabled = false;
+          askBtn.disabled = false;
+          document.getElementById('ask-text').textContent = 'Ask Tutor';
+          responseArea.classList.remove('loading');
+        }
+      }
+
+      askBtn.addEventListener('click', askQuestion);
+      promptEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && e.ctrlKey) {
+          askQuestion();
         }
       });
 
-      // Enter key to submit
-      promptEl.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && e.ctrlKey) {
-          btn.click();
+      // Achievements system
+      function checkAchievements() {
+        const newAchievements = [];
+
+        if (questionCount === 1 && !achievements.includes('first-question')) {
+          newAchievements.push({ id: 'first-question', title: 'Getting Started!', desc: 'Asked your first question', icon: '🌟' });
         }
-      });
+        if (questionCount === 10 && !achievements.includes('curious-learner')) {
+          newAchievements.push({ id: 'curious-learner', title: 'Curious Learner', desc: '10 questions asked!', icon: '🎓' });
+        }
+        if (questionCount === 50 && !achievements.includes('knowledge-seeker')) {
+          newAchievements.push({ id: 'knowledge-seeker', title: 'Knowledge Seeker', desc: '50 questions - you\'re on fire!', icon: '🔥' });
+        }
+
+        // Mode explorer
+        const modes = JSON.parse(localStorage.getItem('modes_used') || '[]');
+        if (!modes.includes(selectedMode)) {
+          modes.push(selectedMode);
+          localStorage.setItem('modes_used', JSON.stringify(modes));
+          if (modes.length === 6 && !achievements.includes('mode-master')) {
+            newAchievements.push({ id: 'mode-master', title: 'Mode Master', desc: 'Tried all learning modes!', icon: '🎨' });
+          }
+        }
+
+        newAchievements.forEach(achievement => {
+          if (!achievements.includes(achievement.id)) {
+            achievements.push(achievement.id);
+            showAchievement(achievement);
+          }
+        });
+
+        localStorage.setItem('achievements', JSON.stringify(achievements));
+        document.getElementById('achievement-count').textContent = achievements.length + '🏆';
+      }
+
+      function showAchievement(achievement) {
+        const popup = document.getElementById('achievement-popup');
+        document.getElementById('achievement-title').textContent = achievement.title;
+        document.getElementById('achievement-desc').textContent = achievement.desc;
+        document.querySelector('.achievement-icon').textContent = achievement.icon;
+        
+        popup.classList.add('show');
+        setTimeout(() => {
+          popup.classList.remove('show');
+        }, 4000);
+      }
     </script>
   </body>
 </html>

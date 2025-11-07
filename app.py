@@ -26,8 +26,8 @@ def _demo_reply(prompt: str) -> str:
     return f"**Demo Response:**\n\nI understood your prompt: *\"{p}\"*.\n\nThis is a demo response showing how the tutor would reply. Set `INFERENCE_API_URL` to enable real model inference."
 
 
-def ask_sync(question: str) -> str:
-    """Handle question answering with demo mode, inference API, or local model fallback."""
+def ask_sync(question: str, mode: str = "standard", difficulty: int = 3, persona: str = "friendly") -> str:
+    """Handle question answering with learning modes, demo mode, inference API, or local model fallback."""
     if not question or not question.strip():
         return "Please enter a question for the tutor."
     
@@ -42,7 +42,12 @@ def ask_sync(question: str) -> str:
             
             resp = httpx.post(
                 INFERENCE_API_URL,
-                json={"inputs": question},
+                json={
+                    "prompt": question,
+                    "mode": mode,
+                    "difficulty": difficulty,
+                    "persona": persona
+                },
                 headers=headers,
                 timeout=60.0
             )
@@ -50,6 +55,8 @@ def ask_sync(question: str) -> str:
             data = resp.json()
             
             # Normalize response
+            if isinstance(data, dict) and "result" in data:
+                return data["result"]
             if isinstance(data, list) and len(data) > 0:
                 first = data[0]
                 if isinstance(first, dict) and "generated_text" in first:
@@ -62,9 +69,34 @@ def ask_sync(question: str) -> str:
         except Exception as e:
             return f"⚠️ Inference API error: {e}\n\nFalling back to demo mode..."
 
-    # Demo mode
+    # Demo mode with learning modes support
     if DEMO_MODE:
-        return _demo_reply(question)
+        mode_emoji = {
+            "socratic": "🤔",
+            "eli5": "👶",
+            "technical": "🔬",
+            "analogy": "🎭",
+            "code": "💻"
+        }.get(mode, "📚")
+        
+        persona_prefix = {
+            "friendly": "Hey there! 😊",
+            "strict": "Attention, student.",
+            "enthusiastic": "OMG this is so cool! 🎉",
+            "professional": "Greetings.",
+            "playful": "Hehe, ready to learn? 😄"
+        }.get(persona, "Hello!")
+        
+        base_reply = _demo_reply(question)
+        
+        return (
+            f"{mode_emoji} **{mode.upper()} Mode** | Difficulty: {difficulty}/5 | Persona: {persona}\n\n"
+            f"{persona_prefix}\n\n"
+            f"{base_reply}\n\n"
+            "---\n"
+            "💡 **Learning Mode Active**: This demo shows how different modes adapt content!\n"
+            "Try other modes like Socratic (questions), ELI5 (simple), Technical (deep), Analogy (metaphors), or Code (examples)."
+        )
 
     # Fallback to local model (only for developers with model weights)
     try:
@@ -77,19 +109,46 @@ def ask_sync(question: str) -> str:
 
 iface = gr.Interface(
     fn=ask_sync,
-    inputs=gr.Textbox(
-        label="Ask the tutor",
-        placeholder="Enter your question here (e.g., 'Explain Newton's laws')",
-        lines=3
-    ),
-    outputs=gr.Textbox(label="Tutor response", lines=10),
+    inputs=[
+        gr.Textbox(
+            label="Ask the tutor",
+            placeholder="Enter your question here (e.g., 'Explain Newton's laws')",
+            lines=3
+        ),
+        gr.Radio(
+            choices=["standard", "socratic", "eli5", "technical", "analogy", "code"],
+            label="📚 Learning Mode",
+            value="standard",
+            info="Choose how you want to learn: Socratic (questions), ELI5 (simple), Technical (deep), Analogy (metaphors), Code (examples)"
+        ),
+        gr.Slider(
+            minimum=1,
+            maximum=5,
+            step=1,
+            value=3,
+            label="🎯 Difficulty Level",
+            info="1 = Beginner, 5 = Expert"
+        ),
+        gr.Radio(
+            choices=["friendly", "strict", "enthusiastic", "professional", "playful"],
+            label="🎭 Tutor Persona",
+            value="friendly",
+            info="Pick your tutor's personality style"
+        )
+    ],
+    outputs=gr.Textbox(label="Tutor response", lines=12),
     title="🧠 Eidolon Cognitive Tutor",
-    description="Interactive tutor demo. Running in **demo mode** by default (set `DEMO_MODE=1` or configure `INFERENCE_API_URL` for real inference).",
+    description="""
+    **Interactive AI Tutor with Multiple Learning Modes**
+    
+    Choose your learning style, adjust difficulty, and pick your tutor's personality!
+    Running in demo mode by default (set `DEMO_MODE=1` or configure `INFERENCE_API_URL` for real inference).
+    """,
     examples=[
-        ["Explain Newton's laws in simple terms"],
-        ["How do I implement a binary search in Python?"],
-        ["Compare supervised vs unsupervised learning"],
-        ["What is the difference between HTTP and HTTPS?"]
+        ["Explain Newton's laws in simple terms", "eli5", 2, "friendly"],
+        ["How do I implement a binary search in Python?", "code", 3, "professional"],
+        ["Compare supervised vs unsupervised learning", "technical", 4, "enthusiastic"],
+        ["What is the difference between HTTP and HTTPS?", "analogy", 2, "playful"]
     ],
     theme="soft"
 )

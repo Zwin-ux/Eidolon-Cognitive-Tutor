@@ -45,6 +45,9 @@ class AskIn(BaseModel):
     max_tokens: Optional[int] = 512
     temperature: Optional[float] = 0.7
     session_id: Optional[str] = None  # for conversation history
+    mode: Optional[str] = "standard"  # learning mode: standard, socratic, eli5, technical, analogy, code
+    difficulty: Optional[int] = 3  # 1-5 difficulty scale
+    persona: Optional[str] = "friendly"  # friendly, strict, enthusiastic, professional
 
 
 class AskOut(BaseModel):
@@ -54,19 +57,57 @@ class AskOut(BaseModel):
     session_id: str = ""  # returned session ID
 
 
-def get_demo_response(prompt: str) -> str:
-    """Generate deterministic demo responses."""
+def get_demo_response(prompt: str, mode: str = "standard", difficulty: int = 3, persona: str = "friendly") -> str:
+    """Generate deterministic demo responses with learning modes and personalization."""
     p = prompt.strip().lower()
     if not p:
         return "Please enter a question for the demo tutor."
+    
+    # Persona prefixes
+    persona_styles = {
+        "friendly": "😊 ",
+        "strict": "📚 ",
+        "enthusiastic": "🎉 ",
+        "professional": "🎓 ",
+        "playful": "🎮 "
+    }
+    prefix = persona_styles.get(persona, "")
+    
+    # Mode-specific responses
+    if mode == "socratic":
+        return f"{prefix}**Socratic Mode** 🤔\n\nGreat question! Let me guide you with some questions:\n\n1. What do you already know about *\"{prompt}\"*?\n2. Can you think of a similar concept you're familiar with?\n3. What would happen if we changed one key variable?\n4. How would you explain this to someone younger?\n\n[Demo mode - these questions would adapt based on your actual responses]"
+    
+    elif mode == "eli5":
+        return f"{prefix}**ELI5 Mode** 👶\n\nOkay, imagine *\"{prompt}\"* like this:\n\nThink of it like building with LEGO blocks. Each block is a simple piece, but when you put them together in the right way, you can build amazing things!\n\n[Demo mode - real responses would use age-appropriate analogies]"
+    
+    elif mode == "technical":
+        difficulty_markers = ["Beginner", "Intermediate", "Advanced", "Expert", "Research-Level"]
+        level = difficulty_markers[min(difficulty - 1, 4)]
+        return f"{prefix}**Technical Deep-Dive** 🔬 (Level: {level})\n\n**Topic:** {prompt}\n\n**Core Concepts:**\n- Fundamental principles and definitions\n- Mathematical/logical foundations\n- Implementation details and edge cases\n- Performance considerations\n- Common pitfalls and best practices\n\n[Demo mode - depth would match difficulty level {difficulty}/5]"
+    
+    elif mode == "analogy":
+        analogies = [
+            "a restaurant kitchen (preparation → cooking → serving)",
+            "a postal system (sending → routing → delivery)",
+            "a factory assembly line (input → processing → output)",
+            "a team sport (strategy → execution → scoring)"
+        ]
+        import random
+        random.seed(len(prompt))  # deterministic
+        analogy = random.choice(analogies)
+        return f"{prefix}**Analogy Master** 🎭\n\nLet me explain *\"{prompt}\"* using an analogy:\n\nIt's like {analogy}.\n\nEach step has a purpose, and when they work together, magic happens!\n\n[Demo mode - analogies would be carefully crafted for each topic]"
+    
+    elif mode == "code":
+        return f"{prefix}**Code Mentor** 💻\n\n```python\n# Pseudocode for: {prompt}\n\nclass Solution:\n    def solve(self, problem):\n        # Step 1: Understand the requirements\n        requirements = self.analyze(problem)\n        \n        # Step 2: Break down into smaller pieces\n        components = self.decompose(requirements)\n        \n        # Step 3: Implement each piece\n        for component in components:\n            self.implement(component)\n        \n        # Step 4: Test and refine\n        return self.test_and_validate()\n```\n\n[Demo mode - would provide working code examples]"
+    
+    # Standard mode (fallback)
     if "explain" in p or "what is" in p:
-        return f"**Demo Explanation:**\n\nHere's a concise explanation for your question: *\"{prompt}\"*.\n\n[Demo mode active. Configure `INFERENCE_API_URL` to use a real model.]"
+        return f"{prefix}**Standard Explanation:**\n\nHere's a concise explanation for *\"{prompt}\"*:\n\n• **Key Point 1:** Main concept overview\n• **Key Point 2:** Why it matters\n• **Key Point 3:** How it's used in practice\n\n[Demo mode - set DEMO_MODE=1 or configure INFERENCE_API_URL]"
+    
     if "code" in p or "how to" in p or "implement" in p:
-        return f"**Demo Steps:**\n\n1. Understand the problem: *\"{prompt}\"*\n2. Break it down into smaller steps\n3. Implement and test\n4. Iterate and refine\n\n[Demo-mode response]"
-    if "compare" in p or "difference" in p:
-        return f"**Demo Comparison:**\n\nKey differences related to *\"{prompt}\"*:\n- Point A vs Point B\n- Tradeoffs and use cases\n\n[Demo mode]"
-    # Generic fallback
-    return f"**Demo Response:**\n\nI understood your prompt: *\"{prompt}\"*.\n\nThis is a demo response showing how the tutor would reply. Set `INFERENCE_API_URL` to enable real model inference."
+        return f"{prefix}**Implementation Guide:**\n\n**Problem:** {prompt}\n\n**Approach:**\n1. Define the requirements clearly\n2. Choose the right data structures\n3. Write clean, testable code\n4. Handle edge cases\n\n[Demo mode]"
+    
+    return f"{prefix}**Response:**\n\nI understood your prompt: *\"{prompt}\"*.\n\nThis is a demo response. Try different **learning modes** (Socratic, ELI5, Technical, Analogy, Code) for varied approaches!\n\n[Demo mode]"
 
 
 async def call_inference_api(
@@ -137,7 +178,7 @@ async def ask(in_data: AskIn, request: Request):
 
     # Demo mode
     if demo_mode or not api_url:
-        result_text = get_demo_response(in_data.prompt)
+        result_text = get_demo_response(in_data.prompt, in_data.mode, in_data.difficulty, in_data.persona)
         save_conversation(session_id, in_data.prompt, result_text, "demo")
         return AskOut(result=result_text, source="demo", session_id=session_id)
 
