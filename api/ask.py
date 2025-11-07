@@ -8,6 +8,7 @@ import uuid
 from collections import defaultdict
 from typing import Optional
 from .history import save_conversation, get_conversation_history
+from .papers import get_relevant_papers
 
 app = FastAPI(title="Eidolon Tutor API", version="0.2.0")
 
@@ -55,6 +56,8 @@ class AskOut(BaseModel):
     error: Optional[str] = None
     source: str = "demo"  # "demo", "inference", or "error"
     session_id: str = ""  # returned session ID
+    # Optional research data to support the response (citations, RAG pipeline, attention, etc.)
+    research_data: Optional[dict] = None
 
 
 def get_demo_response(prompt: str, mode: str = "standard", difficulty: int = 3, persona: str = "friendly") -> str:
@@ -180,7 +183,9 @@ async def ask(in_data: AskIn, request: Request):
     if demo_mode or not api_url:
         result_text = get_demo_response(in_data.prompt, in_data.mode, in_data.difficulty, in_data.persona)
         save_conversation(session_id, in_data.prompt, result_text, "demo")
-        return AskOut(result=result_text, source="demo", session_id=session_id)
+        # Attach relevant paper citations for the prompt/mode
+        papers = get_relevant_papers(in_data.prompt, in_data.mode)
+        return AskOut(result=result_text, source="demo", session_id=session_id, research_data={"papers": papers})
 
     # Call inference API
     result = await call_inference_api(
@@ -190,8 +195,11 @@ async def ask(in_data: AskIn, request: Request):
     # Save to history
     if result.get("result"):
         save_conversation(session_id, in_data.prompt, result["result"], result.get("source", "inference"))
-    
-    return AskOut(**result, session_id=session_id)
+
+    # Add research citations for inference responses as well
+    papers = get_relevant_papers(in_data.prompt, in_data.mode)
+    out_payload = {**result, "session_id": session_id, "research_data": {"papers": papers}}
+    return AskOut(**out_payload)
 
 
 @app.get("/history/{session_id}")

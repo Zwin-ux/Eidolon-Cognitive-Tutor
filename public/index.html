@@ -388,9 +388,16 @@
             <div class="response-text" id="response-text">Your tutor is ready! Pick a learning mode and ask away 🚀</div>
             <div class="response-actions" style="display:none" id="response-actions">
               <button class="icon-btn" id="copy-btn">📋 Copy</button>
+              <button class="icon-btn" id="show-research-btn">🔬 Research</button>
               <button class="icon-btn" id="share-btn">🔗 Share</button>
               <button class="icon-btn" id="regenerate-btn">🔄 Regenerate</button>
             </div>
+          </div>
+
+          <!-- Research citations panel (hidden by default) -->
+          <div class="research-panel" id="research-panel" style="display:none; margin-top:16px; padding:12px; background:#111827; color:#e6eef8; border-radius:8px;">
+            <div style="font-weight:700; margin-bottom:8px;">🔬 Research & Citations</div>
+            <div id="research-list" style="font-size:13px; line-height:1.5;"></div>
           </div>
 
           <div class="examples-grid">
@@ -539,6 +546,18 @@
         }, 2000);
       });
 
+      // Research panel toggle
+      document.getElementById('show-research-btn').addEventListener('click', () => {
+        const panel = document.getElementById('research-panel');
+        if (panel.style.display === 'none' || panel.style.display === '') {
+          panel.style.display = 'block';
+          document.getElementById('show-research-btn').textContent = '🔬 Hide Research';
+        } else {
+          panel.style.display = 'none';
+          document.getElementById('show-research-btn').textContent = '🔬 Research';
+        }
+      });
+
       // Main ask function with typing animation
       async function askQuestion() {
         const prompt = promptEl.value.trim();
@@ -575,6 +594,17 @@
           }
 
           typingIndicator.classList.remove('show');
+
+          // Prepare research citations if present
+          const researchPapers = data.research_data && data.research_data.papers ? data.research_data.papers : null;
+          if (researchPapers && researchPapers.length > 0) {
+            // Render citations immediately (panel hidden until user toggles)
+            renderResearch(researchPapers);
+          } else {
+            // Clear previous
+            document.getElementById('research-list').innerHTML = '';
+            document.getElementById('research-panel').style.display = 'none';
+          }
 
           if (data.error) {
             responseText.textContent = '❌ ' + data.error;
@@ -666,6 +696,25 @@
         setTimeout(() => {
           popup.classList.remove('show');
         }, 4000);
+      }
+
+      // Render research citations into the research panel
+      function renderResearch(papers) {
+        const list = document.getElementById('research-list');
+        if (!papers || papers.length === 0) {
+          list.innerHTML = '<div style="opacity:0.8">No citations available for this response.</div>';
+          return;
+        }
+        let html = '';
+        papers.forEach(p => {
+          const title = p.title || p.name || 'Untitled';
+          const authors = p.authors ? `<div style="opacity:0.8; font-size:12px;">${p.authors} • ${p.year}</div>` : '';
+          const summary = p.summary ? `<div style="margin-top:6px; color:#cfe7ff;">${p.summary}</div>` : '';
+          const url = p.url ? `<a href="${p.url}" target="_blank" style="color:#9ae6ff; text-decoration:underline;">Read paper</a>` : '';
+          html += `<div style="padding:8px 6px; border-bottom:1px dashed rgba(255,255,255,0.06);">` +
+                  `<div style="font-weight:700">${title}</div>` + authors + summary + `<div style="margin-top:6px">${url}</div></div>`;
+        });
+        list.innerHTML = html;
       }
     </script>
   </body>
