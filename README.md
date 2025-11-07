@@ -6,50 +6,46 @@ app_file: app.py
 license: apache-2.0
 ---
 
-# Cognitive LLM with Qwen3
+# 🧠 Eidolon Cognitive Tutor
 
-A simple implementation of a cognitive language model using Qwen3-7B-Instruct from Hugging Face.
+**Interactive AI Tutor with Multiple Learning Modes, Adaptive Difficulty, and Gamification**
 
-## Features
+> Learn Anything, Your Way — Personalized, Interactive, Engaging
 
-- Easy-to-use Python interface for Qwen3-7B-Instruct
-- Optimized for both CUDA and CPU
-- 4-bit quantization for reduced memory usage
-- Interactive command-line interface
-- Configurable generation parameters
-
-## Prerequisites
-
-- Python 3.8 or higher
-- PyTorch (will be installed via requirements.txt)
-- CUDA-compatible GPU (recommended) or CPU
-
-## Installation
-
-1. Clone this repository
-2. Install the required packages:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
+[![Live Demo](https://img.shields.io/badge/🚀-Live%20Demo-blue)](https://huggingface.co/spaces/BonelliLab/Eidolon-CognitiveTutor)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-black)](https://github.com/Zwin-ux/Eidolon-Cognitive-Tutor)
 
 ---
-title: Eidolon
+
+## 🎯 What Makes This Special?
+
+Not just another chatbot - this is a **complete learning experience** with:
+- 📚 **6 Learning Modes**: Socratic, ELI5, Technical, Analogy, Code, Standard
+- 🎚️ **Adaptive Difficulty**: 1-5 scale from Beginner to Expert
+- 🎭 **Tutor Personas**: Choose your teacher's personality style
+- 🏆 **Gamification**: Achievements, streaks, progress tracking
+- ⚡ **Typing Animation**: Smooth character-by-character responses
+- 💾 **Conversation History**: SQLite-backed session storage
+
+**[📖 See all unique features →](./FEATURES.md)** | **[🚀 Quick Start Guide →](./QUICKSTART.md)**
+
 ---
-
-# Eidolon — Interactive Tutor Demo
-
-Production-ready demo application: a static frontend with a serverless API that accepts prompts and returns adaptive responses. Built for easy deployment to Vercel or Hugging Face Spaces with optional inference backend integration.
 
 ## ✨ Features
 
 - **Demo Mode**: Safe, deterministic responses for public demos (no API keys or model hosting required)
 - **External Inference**: Plug in any hosted inference API (Hugging Face, Replicate, custom endpoints)
+- **6 Learning Modes**: Standard, Socratic (questions), ELI5 (simple), Technical (deep), Analogy (metaphors), Code (examples)
+- **Adaptive Difficulty**: 1-5 scale with content that scales to your level
+- **Tutor Personas**: Friendly, Strict, Enthusiastic, Professional, Playful
+- **Gamification**: Achievements, learning streaks, progress tracking
 - **Conversation History**: SQLite-backed session storage with history retrieval
 - **Rate Limiting**: Configurable IP-based rate limiting to prevent abuse
-- **Modern UI**: Interactive interface with example prompts, copy buttons, and loading states
+- **Modern UI**: Interactive interface with typing animation, example prompts, copy buttons, and loading states
 - **Retry Logic**: Automatic retries with exponential backoff for inference calls
 - **CORS Support**: Cross-origin requests enabled for flexible deployment
+- **Prompt Enhancement**: AI-powered suggestions to improve your questions
+- **Mobile Responsive**: Beautiful UI that works on all devices
 
 ## Quick Start (Demo Mode)
 
@@ -147,11 +143,23 @@ Request body:
 ```json
 {
   "prompt": "Your question here",
+  "mode": "standard",
+  "difficulty": 3,
+  "persona": "friendly",
   "max_tokens": 512,
   "temperature": 0.7,
   "session_id": "optional-session-id"
 }
 ```
+
+**Parameters:**
+- `prompt` (string, required): The question or prompt to ask the tutor
+- `mode` (string, optional): Learning mode - `standard`, `socratic`, `eli5`, `technical`, `analogy`, or `code`. Default: `standard`
+- `difficulty` (int, optional): Difficulty level 1-5. Default: `3`
+- `persona` (string, optional): Tutor personality - `friendly`, `strict`, `enthusiastic`, `professional`, or `playful`. Default: `friendly`
+- `max_tokens` (int, optional): Maximum response length. Default: `512`
+- `temperature` (float, optional): Response creativity 0.0-1.0. Default: `0.7`
+- `session_id` (string, optional): Session ID for conversation history
 
 Response:
 ```json
