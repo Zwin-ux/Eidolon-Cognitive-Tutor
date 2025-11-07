@@ -9,7 +9,17 @@ from typing import Optional
 # instantiate the local CognitiveLLM (for developers running locally with the model).
 INFERENCE_API_URL = os.getenv("INFERENCE_API_URL")
 INFERENCE_API_KEY = os.getenv("INFERENCE_API_KEY")
-DEMO_MODE = os.getenv("DEMO_MODE", "0").lower() in ("1", "true", "yes")
+
+# Default to DEMO_MODE if no inference API is configured (safe for public deployment)
+DEMO_MODE_ENV = os.getenv("DEMO_MODE", "").lower()
+if DEMO_MODE_ENV in ("1", "true", "yes"):
+    DEMO_MODE = True
+elif DEMO_MODE_ENV in ("0", "false", "no"):
+    DEMO_MODE = False
+else:
+    # Auto-detect: use demo mode if no inference API configured
+    DEMO_MODE = not bool(INFERENCE_API_URL)
+    print(f"🔮 Auto-detected mode: DEMO_MODE={'ON' if DEMO_MODE else 'OFF'} (set DEMO_MODE env var to override)")
 
 
 def _demo_reply(prompt: str) -> str:
