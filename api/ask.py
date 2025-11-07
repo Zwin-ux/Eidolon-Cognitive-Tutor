@@ -9,6 +9,7 @@ from collections import defaultdict
 from typing import Optional
 from .history import save_conversation, get_conversation_history
 from .papers import get_relevant_papers
+from .rag_tracker import create_rag_pipeline
 
 app = FastAPI(title="Eidolon Tutor API", version="0.2.0")
 
@@ -183,9 +184,22 @@ async def ask(in_data: AskIn, request: Request):
     if demo_mode or not api_url:
         result_text = get_demo_response(in_data.prompt, in_data.mode, in_data.difficulty, in_data.persona)
         save_conversation(session_id, in_data.prompt, result_text, "demo")
+        
         # Attach relevant paper citations for the prompt/mode
         papers = get_relevant_papers(in_data.prompt, in_data.mode)
-        return AskOut(result=result_text, source="demo", session_id=session_id, research_data={"papers": papers})
+        
+        # Generate RAG pipeline visualization
+        rag_pipeline = create_rag_pipeline(in_data.prompt, in_data.mode, result_text)
+        
+        return AskOut(
+            result=result_text, 
+            source="demo", 
+            session_id=session_id, 
+            research_data={
+                "papers": papers,
+                "rag_pipeline": rag_pipeline
+            }
+        )
 
     # Call inference API
     result = await call_inference_api(
@@ -196,9 +210,18 @@ async def ask(in_data: AskIn, request: Request):
     if result.get("result"):
         save_conversation(session_id, in_data.prompt, result["result"], result.get("source", "inference"))
 
-    # Add research citations for inference responses as well
+    # Add research citations and RAG pipeline for inference responses as well
     papers = get_relevant_papers(in_data.prompt, in_data.mode)
-    out_payload = {**result, "session_id": session_id, "research_data": {"papers": papers}}
+    rag_pipeline = create_rag_pipeline(in_data.prompt, in_data.mode, result.get("result", ""))
+    
+    out_payload = {
+        **result, 
+        "session_id": session_id, 
+        "research_data": {
+            "papers": papers,
+            "rag_pipeline": rag_pipeline
+        }
+    }
     return AskOut(**out_payload)
 
 

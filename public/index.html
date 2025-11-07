@@ -282,6 +282,128 @@
       .achievement-title { font-weight: 700; font-size: 18px; margin-bottom: 6px; }
       .achievement-desc { font-size: 14px; color: #64748b; }
       
+      /* RAG Pipeline Visualization Styles */
+      .rag-pipeline {
+        background: #0d1117;
+        border: 1px solid #30363d;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+        color: #c9d1d9;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      }
+      .rag-pipeline-header {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: #58a6ff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .rag-stage {
+        border-left: 3px solid #21262d;
+        padding: 16px;
+        margin: 12px 0;
+        background: #161b22;
+        border-radius: 6px;
+        transition: all 0.3s;
+      }
+      .rag-stage.active {
+        border-left-color: #58a6ff;
+        background: #1c2128;
+        box-shadow: 0 0 0 1px #58a6ff33;
+      }
+      .rag-stage-title {
+        font-weight: 700;
+        font-size: 14px;
+        color: #58a6ff;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .rag-stage-icon {
+        font-size: 18px;
+      }
+      .rag-stage-content {
+        font-size: 13px;
+        color: #8b949e;
+        line-height: 1.6;
+      }
+      .rag-embedding-preview {
+        background: #0d1117;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        overflow-x: auto;
+        margin-top: 8px;
+        border: 1px solid #21262d;
+      }
+      .rag-doc-card {
+        background: #0d1117;
+        border: 1px solid #30363d;
+        border-radius: 6px;
+        padding: 12px;
+        margin: 8px 0;
+        transition: all 0.2s;
+      }
+      .rag-doc-card:hover {
+        border-color: #58a6ff;
+        background: #161b22;
+      }
+      .rag-doc-title {
+        font-weight: 600;
+        color: #c9d1d9;
+        margin-bottom: 4px;
+        font-size: 13px;
+      }
+      .rag-doc-snippet {
+        color: #8b949e;
+        font-size: 12px;
+        margin-bottom: 8px;
+        line-height: 1.5;
+      }
+      .rag-doc-meta {
+        display: flex;
+        gap: 12px;
+        font-size: 11px;
+        color: #6e7681;
+      }
+      .rag-score {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        background: #1a7f3733;
+        border: 1px solid #1a7f37;
+        border-radius: 4px;
+        color: #3fb950;
+        font-weight: 600;
+      }
+      .rag-score.high { background: #1a7f3733; border-color: #1a7f37; color: #3fb950; }
+      .rag-score.medium { background: #9e6a0333; border-color: #9e6a03; color: #d29922; }
+      .rag-score.improved { background: #1f6feb33; border-color: #1f6feb; color: #58a6ff; }
+      .rag-score.decreased { background: #da363633; border-color: #da3636; color: #f85149; }
+      .rag-timeline {
+        font-size: 11px;
+        color: #6e7681;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #21262d;
+      }
+      .rag-citation {
+        display: inline-block;
+        padding: 3px 8px;
+        background: #388bfd33;
+        border: 1px solid #388bfd;
+        border-radius: 4px;
+        color: #58a6ff;
+        font-size: 11px;
+        margin: 4px 4px 4px 0;
+        font-weight: 600;
+      }
+      
       @media (max-width: 768px) {
         .header h1 { font-size: 32px; }
         .mode-selector { flex-wrap: nowrap; padding: 15px; }
@@ -394,10 +516,25 @@
             </div>
           </div>
 
-          <!-- Research citations panel (hidden by default) -->
-          <div class="research-panel" id="research-panel" style="display:none; margin-top:16px; padding:12px; background:#111827; color:#e6eef8; border-radius:8px;">
-            <div style="font-weight:700; margin-bottom:8px;">🔬 Research & Citations</div>
-            <div id="research-list" style="font-size:13px; line-height:1.5;"></div>
+          <!-- Research panel with tabs for Citations and RAG Pipeline -->
+          <div class="research-panel" id="research-panel" style="display:none; margin-top:16px; padding:0; background:#0d1117; color:#e6eef8; border-radius:12px; border:1px solid #30363d; overflow:hidden;">
+            <div style="display:flex; border-bottom:1px solid #21262d; background:#161b22;">
+              <button class="research-tab active" data-tab="papers" style="flex:1; padding:12px; background:none; border:none; color:#58a6ff; font-weight:600; cursor:pointer; border-bottom:2px solid #58a6ff; font-size:13px;">
+                📚 Citations
+              </button>
+              <button class="research-tab" data-tab="rag" style="flex:1; padding:12px; background:none; border:none; color:#8b949e; font-weight:600; cursor:pointer; border-bottom:2px solid transparent; font-size:13px;">
+                � RAG Pipeline
+              </button>
+            </div>
+            
+            <div class="research-tab-content" id="papers-tab" style="padding:16px;">
+              <div style="font-weight:700; margin-bottom:12px; font-size:14px;">Research Foundations</div>
+              <div id="research-list" style="font-size:13px; line-height:1.5;"></div>
+            </div>
+            
+            <div class="research-tab-content" id="rag-tab" style="padding:16px; display:none;">
+              <div id="rag-pipeline-viz"></div>
+            </div>
           </div>
 
           <div class="examples-grid">
@@ -557,6 +694,29 @@
           document.getElementById('show-research-btn').textContent = '🔬 Research';
         }
       });
+      
+      // Research tab switching
+      document.querySelectorAll('.research-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const targetTab = tab.dataset.tab;
+          
+          // Update tab buttons
+          document.querySelectorAll('.research-tab').forEach(t => {
+            t.classList.remove('active');
+            t.style.color = '#8b949e';
+            t.style.borderBottomColor = 'transparent';
+          });
+          tab.classList.add('active');
+          tab.style.color = '#58a6ff';
+          tab.style.borderBottomColor = '#58a6ff';
+          
+          // Update tab content
+          document.querySelectorAll('.research-tab-content').forEach(content => {
+            content.style.display = 'none';
+          });
+          document.getElementById(targetTab + '-tab').style.display = 'block';
+        });
+      });
 
       // Main ask function with typing animation
       async function askQuestion() {
@@ -595,15 +755,24 @@
 
           typingIndicator.classList.remove('show');
 
-          // Prepare research citations if present
-          const researchPapers = data.research_data && data.research_data.papers ? data.research_data.papers : null;
+          // Prepare research data if present
+          const researchData = data.research_data || {};
+          const researchPapers = researchData.papers || null;
+          const ragPipeline = researchData.rag_pipeline || null;
+          
           if (researchPapers && researchPapers.length > 0) {
-            // Render citations immediately (panel hidden until user toggles)
+            // Render citations
             renderResearch(researchPapers);
           } else {
             // Clear previous
-            document.getElementById('research-list').innerHTML = '';
-            document.getElementById('research-panel').style.display = 'none';
+            document.getElementById('research-list').innerHTML = '<div style="opacity:0.8">No citations available.</div>';
+          }
+          
+          if (ragPipeline) {
+            // Render RAG pipeline visualization
+            renderRAGPipeline(ragPipeline);
+          } else {
+            document.getElementById('rag-pipeline-viz').innerHTML = '<div style="opacity:0.8">RAG pipeline data not available.</div>';
           }
 
           if (data.error) {
@@ -708,13 +877,140 @@
         let html = '';
         papers.forEach(p => {
           const title = p.title || p.name || 'Untitled';
-          const authors = p.authors ? `<div style="opacity:0.8; font-size:12px;">${p.authors} • ${p.year}</div>` : '';
-          const summary = p.summary ? `<div style="margin-top:6px; color:#cfe7ff;">${p.summary}</div>` : '';
-          const url = p.url ? `<a href="${p.url}" target="_blank" style="color:#9ae6ff; text-decoration:underline;">Read paper</a>` : '';
-          html += `<div style="padding:8px 6px; border-bottom:1px dashed rgba(255,255,255,0.06);">` +
-                  `<div style="font-weight:700">${title}</div>` + authors + summary + `<div style="margin-top:6px">${url}</div></div>`;
+          const authors = p.authors ? `<div style="opacity:0.8; font-size:12px; color:#8b949e;">${p.authors} • ${p.year} • ${p.venue || ''}</div>` : '';
+          const summary = p.summary ? `<div style="margin-top:6px; color:#c9d1d9; font-size:12px;">${p.summary}</div>` : '';
+          const url = p.url ? `<a href="${p.url}" target="_blank" style="color:#58a6ff; text-decoration:none; font-size:12px; display:inline-block; margin-top:6px;">📄 Read paper →</a>` : '';
+          html += `<div style="padding:12px; border-bottom:1px solid #21262d; background:#161b22; border-radius:6px; margin-bottom:8px;">` +
+                  `<div style="font-weight:700; color:#c9d1d9;">${title}</div>` + authors + summary + `<div>${url}</div></div>`;
         });
         list.innerHTML = html;
+      }
+      
+      // Render RAG Pipeline visualization
+      function renderRAGPipeline(pipelineData) {
+        const container = document.getElementById('rag-pipeline-viz');
+        if (!pipelineData || !pipelineData.stages) {
+          container.innerHTML = '<div style="opacity:0.8">No pipeline data available.</div>';
+          return;
+        }
+        
+        const stages = pipelineData.stages;
+        const totalTime = pipelineData.total_time_ms || 0;
+        
+        let html = `<div class="rag-pipeline">`;
+        html += `<div class="rag-pipeline-header">`;
+        html += `<span style="font-size:20px;">🔍</span>`;
+        html += `<span>Retrieval-Augmented Generation Pipeline</span>`;
+        html += `<span style="margin-left:auto; font-size:12px; color:#8b949e;">Total: ${totalTime.toFixed(0)}ms</span>`;
+        html += `</div>`;
+        
+        // Render each stage
+        stages.forEach((stage, idx) => {
+          const isActive = idx === stages.length - 1; // Last stage is active
+          html += `<div class="rag-stage ${isActive ? 'active' : ''}">`;
+          
+          if (stage.stage === 'query_encoding') {
+            html += `<div class="rag-stage-title">`;
+            html += `<span class="rag-stage-icon">🔤</span>`;
+            html += `<span>1. Query Encoding</span>`;
+            html += `<span style="margin-left:auto; font-size:11px; color:#6e7681;">${stage.timestamp_ms}ms</span>`;
+            html += `</div>`;
+            html += `<div class="rag-stage-content">`;
+            html += `<div><strong>Query:</strong> "${stage.query}"</div>`;
+            html += `<div style="margin-top:8px;"><strong>Encoding Method:</strong> ${stage.encoding_method}</div>`;
+            html += `<div style="margin-top:8px;"><strong>Embedding Dimension:</strong> ${stage.embedding_dim}</div>`;
+            html += `<div class="rag-embedding-preview">`;
+            html += `<div style="color:#6e7681; margin-bottom:4px;">Embedding preview (first 10 dimensions):</div>`;
+            html += `<code style="color:#79c0ff;">[${stage.embedding_preview.join(', ')}...]</code>`;
+            html += `</div>`;
+            html += `</div>`;
+          }
+          
+          else if (stage.stage === 'retrieval') {
+            html += `<div class="rag-stage-title">`;
+            html += `<span class="rag-stage-icon">📚</span>`;
+            html += `<span>2. Document Retrieval</span>`;
+            html += `<span style="margin-left:auto; font-size:11px; color:#6e7681;">${stage.search_time_ms}ms</span>`;
+            html += `</div>`;
+            html += `<div class="rag-stage-content">`;
+            html += `<div><strong>Documents Searched:</strong> ${stage.num_documents_searched.toLocaleString()}</div>`;
+            html += `<div style="margin-top:4px;"><strong>Top Results Retrieved:</strong> ${stage.top_k_retrieved}</div>`;
+            html += `<div style="margin-top:12px; font-weight:600;">Retrieved Documents:</div>`;
+            
+            stage.documents.slice(0, 3).forEach((doc, i) => {
+              const scoreClass = doc.relevance_score > 0.9 ? 'high' : doc.relevance_score > 0.8 ? 'medium' : '';
+              html += `<div class="rag-doc-card">`;
+              html += `<div class="rag-doc-title">${i + 1}. ${doc.title}</div>`;
+              html += `<div class="rag-doc-snippet">${doc.snippet}</div>`;
+              html += `<div class="rag-doc-meta">`;
+              html += `<span class="rag-score ${scoreClass}">⭐ ${(doc.relevance_score * 100).toFixed(1)}%</span>`;
+              html += `<span>📖 ${doc.source}</span>`;
+              if (doc.citations) html += `<span>📊 ${doc.citations} citations</span>`;
+              html += `</div></div>`;
+            });
+            html += `</div>`;
+          }
+          
+          else if (stage.stage === 'reranking') {
+            html += `<div class="rag-stage-title">`;
+            html += `<span class="rag-stage-icon">🔄</span>`;
+            html += `<span>3. Cross-Encoder Re-ranking</span>`;
+            html += `<span style="margin-left:auto; font-size:11px; color:#6e7681;">${stage.reranking_time_ms}ms</span>`;
+            html += `</div>`;
+            html += `<div class="rag-stage-content">`;
+            html += `<div><strong>Re-ranker Model:</strong> ${stage.reranked_documents[0]?.reranker || 'cross-encoder'}</div>`;
+            html += `<div style="margin-top:12px; font-weight:600;">Score Adjustments:</div>`;
+            
+            stage.reranked_documents.forEach((doc, i) => {
+              const change = doc.score_change;
+              const scoreClass = change > 0 ? 'improved' : change < 0 ? 'decreased' : '';
+              const arrow = change > 0 ? '↑' : change < 0 ? '↓' : '→';
+              html += `<div class="rag-doc-card">`;
+              html += `<div class="rag-doc-title">${i + 1}. ${doc.title}</div>`;
+              html += `<div class="rag-doc-meta">`;
+              html += `<span style="color:#6e7681;">Old: ${(doc.old_score * 100).toFixed(1)}%</span>`;
+              html += `<span class="rag-score ${scoreClass}">${arrow} ${(doc.new_score * 100).toFixed(1)}%</span>`;
+              html += `<span style="color:${change > 0 ? '#3fb950' : change < 0 ? '#f85149' : '#8b949e'};">${change > 0 ? '+' : ''}${(change * 100).toFixed(1)}%</span>`;
+              html += `</div></div>`;
+            });
+            html += `</div>`;
+          }
+          
+          else if (stage.stage === 'generation') {
+            html += `<div class="rag-stage-title">`;
+            html += `<span class="rag-stage-icon">✍️</span>`;
+            html += `<span>4. Response Generation</span>`;
+            html += `<span style="margin-left:auto; font-size:11px; color:#6e7681;">${stage.generation_time_ms}ms</span>`;
+            html += `</div>`;
+            html += `<div class="rag-stage-content">`;
+            html += `<div><strong>Context Documents:</strong> ${stage.num_context_docs}</div>`;
+            html += `<div style="margin-top:4px;"><strong>Total Context Length:</strong> ${stage.context_length} chars</div>`;
+            html += `<div style="margin-top:4px;"><strong>Generated Response:</strong> ${stage.response_length} chars</div>`;
+            
+            if (stage.citations && stage.citations.length > 0) {
+              html += `<div style="margin-top:12px; font-weight:600;">Source Attribution:</div>`;
+              html += `<div style="margin-top:8px;">`;
+              stage.citations.forEach(cite => {
+                if (cite.used) {
+                  html += `<span class="rag-citation">[${cite.id}] ${cite.title} (${(cite.relevance * 100).toFixed(0)}%)</span>`;
+                }
+              });
+              html += `</div>`;
+            }
+            html += `</div>`;
+          }
+          
+          html += `</div>`;
+        });
+        
+        // Add timeline summary
+        html += `<div class="rag-timeline">`;
+        html += `<strong>Pipeline Components:</strong> `;
+        html += pipelineData.components ? pipelineData.components.join(' → ') : 'Query Encoder → Vector DB → Re-ranker → Generator';
+        html += `</div>`;
+        html += `</div>`;
+        
+        container.innerHTML = html;
       }
     </script>
   </body>
