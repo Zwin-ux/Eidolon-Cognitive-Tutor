@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Eidolon Cognitive Tutor</title>
+    <style>
+      body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background:#f7f8fb; color:#0f1724; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0 }
+      .card { background:#fff; padding:28px; border-radius:12px; box-shadow:0 6px 30px rgba(20,20,40,0.08); width:720px; max-width:92% }
+      h1 { margin:0 0 8px 0; font-size:20px }
+      p.lead { margin:0 0 20px 0; color:#475569 }
+      textarea { width:100%; height:140px; padding:12px; border-radius:8px; border:1px solid #e6e9ef; resize:vertical; font-size:14px }
+      button { background:#0b84ff; color:white; border:none; padding:10px 16px; border-radius:8px; font-weight:600; cursor:pointer }
+      .out { margin-top:16px; padding:12px; border-radius:8px; background:#f1f5f9; min-height:80px; white-space:pre-wrap }
+      .meta { display:flex; gap:8px; margin-top:12px }
+      .small { font-size:13px; color:#64748b }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Eidolon Cognitive Tutor</h1>
+      <p class="lead">Ask the tutor a question. This demo proxies to a hosted inference API configured in the serverless function.</p>
+
+      <textarea id="prompt" placeholder="Explain Newton's laws in simple terms..."></textarea>
+      <div class="meta">
+        <button id="ask">Ask tutor</button>
+        <div class="small">Responses powered by your configured inference backend.</div>
+      </div>
+
+      <div class="out" id="out">Awaiting question...</div>
+    </div>
+
+    <script>
+      const btn = document.getElementById('ask');
+      const out = document.getElementById('out');
+      const promptEl = document.getElementById('prompt');
+
+      btn.addEventListener('click', async () => {
+        const prompt = promptEl.value.trim();
+        if (!prompt) { out.textContent = 'Please enter a question.'; return }
+        out.textContent = 'Thinking...';
+        try {
+          const resp = await fetch('/api/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+          });
+          const data = await resp.json();
+          if (data.error) out.textContent = 'Error: ' + (data.detail || data.error);
+          else out.textContent = data.result || JSON.stringify(data.result, null, 2);
+        } catch (e) {
+          out.textContent = 'Request failed: ' + e.message;
+        }
+      });
+    </script>
+  </body>
+</html>

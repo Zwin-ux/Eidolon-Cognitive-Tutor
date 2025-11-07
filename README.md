@@ -33,57 +33,73 @@ A simple implementation of a cognitive language model using Qwen3-7B-Instruct fr
    pip install -r requirements.txt
    ```
 
-## Usage
+---
+title: Eidolon
+---
 
-1. Run the interactive CLI:
+# Eidolon — interactive tutor demo
 
-   ```bash
-   python cognitive_llm.py
-   ```
+This repository contains a small demo app: a static frontend plus a lightweight serverless API that accepts prompts and returns text responses. The project is organized so you can run a demo locally or deploy the static site and API to Vercel.
 
-2. Enter your prompt when prompted with `>>` and press Enter
-3. Type 'quit' or 'exit' to exit the program
+This README focuses only on the repository's functions and how to run or present it.
 
-### Example Usage
+## Quick start (demo mode)
 
-```python
-from cognitive_llm import CognitiveLLM
+1. Install the developer dependencies (lightweight):
 
-# Initialize the LLM
-llm = CognitiveLLM()
-
-# Generate text
-response = llm.generate(
-    "Explain quantum computing in simple terms.",
-    max_new_tokens=256,
-    temperature=0.7
-)
-print(response)
+```powershell
+pip install -r dev-requirements.txt
 ```
 
-## Configuration
+2. Start the demo (PowerShell):
 
-You can customize the model and generation parameters:
-
-```python
-llm = CognitiveLLM(
-    model_name="Qwen/Qwen3-7B-Instruct",  # Model name or path
-    device="cuda"  # 'cuda', 'mps', or 'cpu'
-)
-
-# Generate with custom parameters
-response = llm.generate(
-    "Your prompt here",
-    max_new_tokens=512,
-    temperature=0.7,
-    top_p=0.9,
-    do_sample=True
-)
+```powershell
+.\scripts\run_demo.ps1
 ```
 
-## Note
+The demo runs the local UI and API in `DEMO_MODE`, which returns canned responses suitable for public demos.
 
-- First run will download the model weights (several GB)
-- A CUDA-compatible GPU is recommended for reasonable performance
-- Ensure you have sufficient disk space for the model weights
-- Internet connection is required for the initial download
+## Files and functionality
+
+- `public/index.html` — static single-page UI used for demos.
+- `api/ask.py` — serverless API endpoint (FastAPI). It forwards requests to an external service when configured, or returns demo responses when `DEMO_MODE` is enabled.
+- `app.py` — local Gradio UI that can run in demo mode or proxy to an external service.
+- `cognitive_llm.py` — local model loader and interface (for development only; not required for demos).
+- `vercel.json` — Vercel configuration (serves `public/` and `api/`).
+- `dev-requirements.txt` — lightweight packages used for running tests and the demo without heavy ML libraries.
+- `tests/test_api.py` — a small test that verifies the API demo behavior.
+- `.github/workflows/ci.yml` — CI: installs `dev-requirements.txt`, runs tests and lint checks.
+
+## Deploying (Vercel)
+
+The repo includes a `vercel.json` to serve the static site and Python serverless functions. To publish a public demo on Vercel:
+
+1. (Optional) Configure environment variables in the Vercel project settings:
+
+   - `DEMO_MODE=1` — run demo-mode responses without external services.
+   - `INFERENCE_API_URL` / `INFERENCE_API_KEY` — optional: if you have an external text-generation service, set these to enable real responses.
+
+2. Deploy with the Vercel CLI or the Vercel dashboard. From the repo root:
+
+```powershell
+vercel --prod
+```
+
+When `DEMO_MODE` is set, the deployed site will return safe demo responses and requires no external services or keys.
+
+## Testing and CI
+
+Run the lightweight tests locally after installing dev dependencies:
+
+```powershell
+pip install -r dev-requirements.txt
+pytest -q
+```
+
+CI is configured to run the same test and lint steps on push/pull requests.
+
+## Presenting this repository
+
+For public presentations or a minimal demo, set `DEMO_MODE=1` and deploy to Vercel or run the local demo script. The UI and API are designed so reviewers can interact with the demo without installing large models or sharing API keys.
+
+If you want the README even shorter or want me to remove files not needed for the public demo, tell me which files to remove and I will prepare a clean branch for presentation.
