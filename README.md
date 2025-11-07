@@ -103,3 +103,14 @@ CI is configured to run the same test and lint steps on push/pull requests.
 For public presentations or a minimal demo, set `DEMO_MODE=1` and deploy to Vercel or run the local demo script. The UI and API are designed so reviewers can interact with the demo without installing large models or sharing API keys.
 
 If you want the README even shorter or want me to remove files not needed for the public demo, tell me which files to remove and I will prepare a clean branch for presentation.
+
+## Results & development stage (short)
+
+- Demo responses: canned, deterministic outputs returned when `DEMO_MODE=1`. They are designed to show typical short explanations and step-by-step answers (e.g., brief summaries, simple how-tos). The API returns a JSON object with a `result` string.
+- Current stage: demo-ready for public presentation. CI (lightweight) and demo UI are configured. The full model code remains in the main branch for development but is removed from this `demo` branch to keep the presentation lightweight.
+
+## One-click deploy (optional)
+
+Click to create a Vercel project from this repository:
+
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/Zwin-ux/Eidolon)
